@@ -39,13 +39,11 @@ function depends_retroarch() {
 }
 
 function sources_retroarch() {
-    gitPullOrClone "$md_build" https://github.com/libretro/RetroArch.git v1.8.8
-    applyPatch "$md_data/01_hotkey_hack.diff"
-    applyPatch "$md_data/02_disable_search.diff"
-    applyPatch "$md_data/03_shader_path_config_enable.diff"
-    # revert of https://github.com/libretro/RetroArch/pull/10524/commits/9eb84728
-    # see https://github.com/RetroPie/RetroPie-Setup/issues/3249
-    applyPatch "$md_data/04_config_save_fix.diff"
+    gitPullOrClone "$md_build" https://github.com/libretro/RetroArch.git v1.9.0
+    applyPatch "$md_data/01_disable_search.diff"
+    applyPatch "$md_data/02_shader_path_config_enable.diff"
+    applyPatch "$md_data/03_revert_default_save_paths.diff"
+    applyPatch "$md_data/04_fix_static_function_placement.diff"
 }
 
 function build_retroarch() {
@@ -67,7 +65,7 @@ function build_retroarch() {
     isPlatform "arm" && params+=(--enable-floathard)
     isPlatform "neon" && params+=(--enable-neon)
     isPlatform "x11" && params+=(--enable-vulkan)
-    ! isPlatform "x11" && params+=(--disable-vulkan --disable-wayland)
+    ! isPlatform "x11" && params+=(--disable-vulkan --disable-vulkan)
     isPlatform "vero4k" && params+=(--enable-mali_fbdev --with-opengles_libs='-L/opt/vero3/lib')
     ./configure --prefix="$md_inst" "${params[@]}"
     make clean
