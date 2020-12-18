@@ -294,7 +294,6 @@ function get_all_x11_modes()
         
         # Exit after the first output
         type && output {exit} # New header and output set means new output
-        
         # many outputs can be connected, but only the ones with the id are in use.
         # output must be connected and have an (id)
         type && / connected/ && /\(0x[0-9a-f]+\)/ {

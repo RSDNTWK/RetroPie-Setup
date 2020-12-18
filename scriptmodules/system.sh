@@ -452,7 +452,7 @@ function platform_rpi3() {
         __platform_flags+=(arm armv8 neon)
     else
         __default_cpu_flags="-mcpu=cortex-a53"
-        __platform_flags+=(aarch64)
+        __platform_flags+=(aarch64 x11)
     fi
     __platform_flags+=(rpi gles)
     __qemu_cpu=cortex-a53
@@ -464,7 +464,7 @@ function platform_rpi4() {
         __platform_flags+=(arm armv8 neon)
     else
         __default_cpu_flags="-mcpu=cortex-a72"
-        __platform_flags+=(aarch64)
+        __platform_flags+=(aarch64 x11)
     fi
     __platform_flags+=(rpi gles gles3)
 }
