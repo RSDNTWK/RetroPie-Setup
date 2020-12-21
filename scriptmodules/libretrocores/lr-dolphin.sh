@@ -21,7 +21,7 @@ function depends_lr-dolphin() {
 }
 
 function sources_lr-dolphin() {
-    gitPullOrClone "$md_build" https://github.com/libretro/dolphin
+    gitPullOrClone "$md_build" https://github.com/RSDNTWK/dolphin.git
 }
 
 function build_lr-dolphin() {
