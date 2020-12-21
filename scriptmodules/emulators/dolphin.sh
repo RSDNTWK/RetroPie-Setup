@@ -28,7 +28,7 @@ function sources_dolphin() {
     # current HEAD of dolphin doesn't build on Ubuntu 16.04 (with  gcc 5.4)
     compareVersions $__gcc_version lt 6 && branch="5.0"
 
-    gitPullOrClone "$md_build" https://github.com/dolphin-emu/dolphin.git "$branch"
+    gitPullOrClone "$md_build" https://github.com/RSDNTWK/dolphin.git "$branch"
 }
 
 function build_dolphin() {
