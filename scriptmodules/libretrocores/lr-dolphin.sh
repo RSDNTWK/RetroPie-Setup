@@ -21,7 +21,7 @@ function depends_lr-dolphin() {
 }
 
 function sources_lr-dolphin() {
-    gitPullOrClone "$md_build" https://github.com/RSDNTWK/dolphin.git
+    gitPullOrClone "$md_build" https://github.com/TomBebb/dolphin-switch.git
 }
 
 function build_lr-dolphin() {
