@@ -87,6 +87,8 @@ function update_shaders_retroarch() {
     # remove if not git repository for fresh checkout
     [[ ! -d "$dir/.git" ]] && rm -rf "$dir"
     gitPullOrClone "$dir" https://github.com/RetroPie/common-shaders.git "$branch"
+	[[ ! -d "$dir/.git" ]] && rm -rf "$dir/.git"
+	gitPullOrClone "$dir" https://github.com/libretro/slang-shaders.git "$branch"
     chown -R $user:$user "$dir"
 }
 
