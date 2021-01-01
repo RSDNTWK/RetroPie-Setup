@@ -61,7 +61,7 @@ function build_retroarch() {
     # Temporarily block dispmanx support for fkms until upstream support is fixed
     isPlatform "dispmanx" && ! isPlatform "kms" && params+=(--enable-dispmanx --disable-opengl1)
     isPlatform "mali" && params+=(--enable-mali_fbdev)
-    isPlatform "kms" && params+=(--enable-kms --enable-egl)
+    isPlatform "kms" && params+=(--enable-kms --enable-egl --enable-vulkan --disable-wayland)
     isPlatform "arm" && params+=(--enable-floathard)
     isPlatform "neon" && params+=(--enable-neon)
     isPlatform "x11" && params+=(--enable-vulkan)

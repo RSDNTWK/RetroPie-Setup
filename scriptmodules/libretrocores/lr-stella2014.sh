@@ -26,7 +26,7 @@ function sources_lr-stella2014() {
 
 function build_lr-stella2014() {
     make clean
-    make
+    make HAVE_VULKAN=1
     md_ret_require="$md_build/stella2014_libretro.so"
 }
 

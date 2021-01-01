@@ -18,10 +18,10 @@ rp_module_flags=""
 
 function depends_lr-mupen64plus-next() {
     local depends=()
-    isPlatform "x11" && depends+=(libglew-dev libglu1-mesa-dev)
+    isPlatform "x11" && depends+=(libglew-dev libglu1-mesa-dev libvulkan-dev)
     isPlatform "x86" && depends+=(nasm)
     isPlatform "videocore" && depends+=(libraspberrypi-dev)
-    isPlatform "mesa" && depends+=(libgles2-mesa-dev)
+    isPlatform "mesa" && depends+=(libgles2-mesa-dev libvulkan-dev)
     getDepends "${depends[@]}"
 }
 
@@ -40,16 +40,16 @@ function build_lr-mupen64plus-next() {
             params+=(platform="odroid")
         fi
         if isPlatform "neon"; then
-            params+=(HAVE_NEON=1)
+            params+=(HAVE_NEON=1 HAVE_VULKAN=1)
         else
             # force disabling HAVE_NEON on armv6 as makefile sets it for all rpi targets
-            params+=(HAVE_NEON=0)
+            params+=(HAVE_NEON=0 HAVE_VULKAN=1)
         fi
     fi
     if isPlatform "gles3"; then
-        params+=(FORCE_GLES3=1)
+        params+=(FORCE_GLES3=1 HAVE_VULKAN=1)
     elif isPlatform "gles"; then
-        params+=(FORCE_GLES=1)
+        params+=(FORCE_GLES=1 HAVE_VULKAN=1)
     fi
 
     # use a custom core name to avoid core option name clashes with lr-mupen64plus

@@ -27,7 +27,7 @@ function sources_lr-dolphin() {
 function build_lr-dolphin() {
     mkdir build
     cd build
-    cmake .. -DLIBRETRO=ON -DLIBRETRO_STATIC=1
+    cmake .. -DLIBRETRO=ON -DLIBRETRO_STATIC=1 -DHAVE_VULKAN=1
     make clean
     make
     md_ret_require="$md_build/build/dolphin_libretro.so"

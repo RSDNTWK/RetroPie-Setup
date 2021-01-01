@@ -134,7 +134,7 @@ function build_ppsspp() {
             params+=(-DCMAKE_TOOLCHAIN_FILE=cmake/Toolchains/raspberry.armv7.cmake)
         fi
     elif isPlatform "mesa"; then
-        params+=(-DUSING_GLES2=ON -DUSING_EGL=OFF)
+        params+=(-DUSING_GLES2=ON -DUSING_EGL=OFF -DARM_NO_VULKAN=OFF)
     elif isPlatform "mali"; then
         params+=(-DUSING_GLES2=ON -DUSING_FBDEV=ON)
         # remove -DGL_GLEXT_PROTOTYPES on odroid-xu/tinker to avoid errors due to header prototype differences
@@ -146,7 +146,7 @@ function build_ppsspp() {
         params+=(-DCMAKE_TOOLCHAIN_FILE="cmake/Toolchains/vero4k.armv8.cmake")
     fi
     if isPlatform "arm" && ! isPlatform "x11"; then
-        params+=(-DARM_NO_VULKAN=ON)
+        params+=(-DARM_NO_VULKAN=OFF)
     fi
     if [[ "$md_id" == "lr-ppsspp" ]]; then
         params+=(-DLIBRETRO=On)

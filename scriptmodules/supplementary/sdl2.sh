@@ -16,7 +16,7 @@ rp_module_section="depends"
 rp_module_flags=""
 
 function get_ver_sdl2() {
-    echo "2.0.10"
+    echo "2.0.14"
 }
 
 function get_pkg_ver_sdl2() {
@@ -58,9 +58,9 @@ function depends_sdl2() {
 function sources_sdl2() {
     local ver="$(get_ver_sdl2)"
     local pkg_ver="$(get_pkg_ver_sdl2)"
-    local branch="retropie-${ver}"
+    local branch="release-${ver}"
 
-    gitPullOrClone "$md_build/$pkg_ver" https://github.com/RetroPie/SDL-mirror "$branch"
+    gitPullOrClone "$md_build/$pkg_ver" https://github.com/spurious/SDL-mirror "$branch"
     cd "$pkg_ver"
     DEBEMAIL="Jools Wills <buzz@exotica.org.uk>" dch -v "$pkg_ver" "SDL $ver configured for the $__platform"
 }
