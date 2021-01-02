@@ -62,9 +62,9 @@ _EOF_
     fi
 
     addEmulator 1 "$md_id" "gc" "$md_inst/bin/dolphin-emu-nogui -p headless -v Vulkan -e %ROM%"
-    addEmulator 0 "$md_id-gui" "gc" "xinit -e $md_inst/bin/dolphin-emu -b -e %ROM%"
+    addEmulator 0 "$md_id-gui" "gc" "$md_inst/bin/dolphin-emu -b -e %ROM%"
     addEmulator 1 "$md_id" "wii" "$md_inst/bin/dolphin-emu-nogui -p headless -v Vulkan -e %ROM%"
-    addEmulator 0 "$md_id-gui" "wii" "xinit -e $md_inst/bin/dolphin-emu -b -e %ROM%"
+    addEmulator 0 "$md_id-gui" "wii" "$md_inst/bin/dolphin-emu -b -e %ROM%"
 
     addSystem "gc"
     addSystem "wii"
