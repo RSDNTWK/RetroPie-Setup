@@ -134,9 +134,9 @@ function build_ppsspp() {
             params+=(-DCMAKE_TOOLCHAIN_FILE=cmake/Toolchains/raspberry.armv7.cmake)
         fi
     elif isPlatform "mesa"; then
-        params+=(-DUSING_GLES2=ON -DUSING_EGL=OFF -DARM_NO_VULKAN=OFF)
+        params+=(-DUSING_GLES2=ON -DUSING_EGL=OFF -DARM_NO_VULKAN=OFF -DVULKAN=ON)
     elif isPlatform "mali"; then
-        params+=(-DUSING_GLES2=ON -DUSING_FBDEV=ON)
+        params+=(-DUSING_GLES2=ON -DUSING_FBDEV=ON -DARM_NO_VULKAN=OFF -DVULKAN=ON)
         # remove -DGL_GLEXT_PROTOTYPES on odroid-xu/tinker to avoid errors due to header prototype differences
         params+=(-DCMAKE_C_FLAGS="${CFLAGS/-DGL_GLEXT_PROTOTYPES/}")
         params+=(-DCMAKE_CXX_FLAGS="${CXXFLAGS/-DGL_GLEXT_PROTOTYPES/}")
@@ -149,7 +149,7 @@ function build_ppsspp() {
         params+=(-DARM_NO_VULKAN=OFF)
     fi
     if [[ "$md_id" == "lr-ppsspp" ]]; then
-        params+=(-DLIBRETRO=On)
+        params+=(-DLIBRETRO=On -DARM_NO_VULKAN=OFF -DVULKAN=ON)
         ppsspp_binary="lib/ppsspp_libretro.so"
     fi
     "$cmake" "${params[@]}" .

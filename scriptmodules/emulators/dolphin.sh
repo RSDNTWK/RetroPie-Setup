@@ -34,7 +34,7 @@ function sources_dolphin() {
 function build_dolphin() {
     mkdir build
     cd build
-    cmake .. -DCMAKE_INSTALL_PREFIX="$md_inst"
+    cmake .. -DHAVE_VULKAN=1 -DCMAKE_INSTALL_PREFIX="$md_inst"
     make clean
     make
     md_ret_require="$md_build/build/Binaries/dolphin-emu"
