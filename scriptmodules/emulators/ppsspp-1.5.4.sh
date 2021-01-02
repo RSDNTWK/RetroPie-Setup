@@ -14,7 +14,7 @@ rp_module_desc="PlayStation Portable emulator PPSSPP v1.5.4"
 rp_module_help="ROM Extensions: .iso .pbp .cso\n\nCopy your PlayStation Portable roms to $romdir/psp"
 rp_module_licence="GPL2 https://raw.githubusercontent.com/hrydgard/ppsspp/master/LICENSE.TXT"
 rp_module_section="opt"
-rp_module_flags="!all videocore"
+rp_module_flags="videocore"
 
 function depends_ppsspp-1.5.4() {
     depends_ppsspp
