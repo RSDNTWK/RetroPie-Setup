@@ -16,7 +16,7 @@ rp_module_section="depends"
 rp_module_flags=""
 
 function get_ver_sdl2() {
-    echo "2.0.14"
+    echo "2.0.12"
 }
 
 function get_pkg_ver_sdl2() {
