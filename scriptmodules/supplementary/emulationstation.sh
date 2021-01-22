@@ -164,6 +164,9 @@ function build_emulationstation() {
         isPlatform "mesa" && params+=(-DGL=On -DHAVE_VULKAN=1)
         # force GLESv1 on videocore due to performance issue with GLESv2
         isPlatform "videocore" && params+=(-DUSE_GLES1=On -DHAVE_VULKAN=1)
+    elif isPlatform "x11"; then
+        local gl_ver=$(sudo -u $user glxinfo | grep -oP "OpenGL version string: \K(\d+)")
+        [[ "$gl_ver" -gt 1 ]] && params+=(-DUSE_OPENGL_21=On -DHAVE_VULKAN=1)
     fi
     rpSwap on 1000
     cmake . "${params[@]}"
