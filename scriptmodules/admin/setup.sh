@@ -187,7 +187,7 @@ function package_setup() {
         if rp_isInstalled "$id"; then
             eval $(rp_getPackageInfo "$id")
             status="Installed - via $pkg_origin"
-            [[ -n "$pkg_date" ]] && status+=" (built: $pkg_date)"
+            [[ -n "$pkg_date" ]] && status+=" (built: $(date -u -d "$pkg_date"))"
 
             if [[ "$pkg_origin" != "source" && "$has_binary" -eq 1 ]]; then
                 rp_hasNewerBinary "$id"
@@ -329,12 +329,14 @@ function section_gui_setup() {
         local num_pkgs=0
         local info
         local type
+        local last_type=""
         for id in $(rp_getSectionIds $section); do
+            local type="${__mod_info[$id/vendor]} - ${__mod_info[$id/type]}"
             # do a heading for each origin and module type
-            if [[ "$type" != "${__mod_info[$id/type]}" ]]; then
-                info="${__mod_info[$id/vendor]} - ${__mod_info[$id/type]}"
+            if [[ "$last_type" != "$type" ]]; then
+                info="$type"
                 pkgs+=("----" "\Z4$info ----\Zn" "Packages from $info")
-                type="${__mod_info[$id/type]}"
+                last_type="$type"
             fi
             if ! rp_isEnabled "$id"; then
                 info="\Zb*$id - Not available for your system\Zn"
