@@ -144,9 +144,11 @@ function rp_callModule() {
     local md_help="${__mod_info[$md_id/help]}"
     local md_type="${__mod_info[$md_id/type]}"
     local md_flags="${__mod_info[$md_id/flags]}"
+    local md_path="${__mod_info[$md_id/path]}"
     local md_build="$__builddir/$md_id"
     local md_inst="$(rp_getInstallPath $md_id)"
-    local md_data="$scriptdir/scriptmodules/$md_type/$md_id"
+    # get module path folder + md_id for $md_data
+    local md_data="${md_path%/*}/$md_id"
     local md_mode="install"
 
     # set md_conf_root to $configdir and to $configdir/ports for ports
@@ -394,9 +396,15 @@ function rp_getBinaryDate() {
     local url="$(rp_getBinaryUrl $id)"
     [[ -z "$url" || "$url" == "notest" ]] && return 1
 
-    local bin_date=$(curl -sfI $url | grep -i "last-modified" | cut -d" " -f2-)
-    echo "$bin_date"
-    return 0
+    # get last-modified date stripping any CR in the output
+    local bin_date=$(curl -sfI --no-styled-output "$url" | tr -d "\r" | grep -ioP "last-modified: \K.+")
+    # if there is a date set in last-modified header, then convert to iso-8601 format
+    if [[ -n "$bin_date" ]]; then
+        bin_date="$(date -Iseconds --date="$bin_date")"
+        echo "$bin_date"
+        return 0
+    fi
+    return 1
 }
 
 function rp_hasNewerBinary() {
@@ -501,7 +509,7 @@ function rp_setPackageInfo() {
     if [[ "$origin" == "binary" ]]; then
         pkg_date="$(rp_getBinaryDate $id)"
     else
-        pkg_date="$(date)"
+        pkg_date="$(date -Iseconds)"
     fi
     iniSet "pkg_date" "$pkg_date"
 }
@@ -616,7 +624,6 @@ function rp_registerModuleDir() {
     local vendor="$2"
     [[ -z "$vendor" ]] && return 1
     local module
-    local vendor
     while read module; do
         rp_registerModule "$module" "$dir" "$vendor"
     done < <(find "$dir" -mindepth 1 -maxdepth 1 -type f -name "*.sh" | sort)
@@ -630,7 +637,7 @@ function rp_registerAllModules() {
 
     local dir
     local type
-    local origin
+    local vendor
     while read dir; do
         # get parent folder
         vendor="${dir%/*}"
@@ -674,9 +681,9 @@ function rp_isEnabled() {
 
 function rp_updateHooks() {
     local function
-    local mod_id
+    local id
     for function in $(compgen -A function _update_hook_); do
-        mod_id="${function/_update_hook_/}"
-        [[ -n "$mod_id" ]] && rp_callModule "$mod_id" _update_hook
+        id="${function/_update_hook_/}"
+        [[ -n "$id" && "${__mod_info[$id/enabled]}" -eq 1 ]] && rp_callModule "$id" _update_hook
     done
 }
