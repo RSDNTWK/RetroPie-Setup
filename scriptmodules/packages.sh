@@ -528,10 +528,15 @@ function rp_getRemoteRepoHash() {
     set -o pipefail
     case "$type" in
         git)
-            cmd=(git ls-remote "$url" "$branch")
-            # grep to make sure we only return refs/heads/BRANCH and refs/tags/BRANCH in case there are
-            # additional references to the branch/tag eg refs/heads/SOMETHINGELSE/master which can be the case
-            hash=$("${cmd[@]}" 2>/dev/null | grep -P "\trefs/(heads|tags)/$branch" | cut -f1)
+            # when the remote repository uses an annotated git tag, the real commit is found by looking for the
+            # "tag^{}" reference, since the tag ref will point to the tag object itself, instead of the tagged
+            # commit. See gitrevisions(7).
+            cmd=(git ls-remote "$url" "$branch" "$branch^{}")
+            # grep to make sure we only return refs/heads/BRANCH and refs/tags/BRANCH in case there are additional
+            # references to the branch/tag eg refs/heads/SOMETHINGELSE/master which can be the case.
+            # we grab the last match reported by grep, as tags that also have a tag^{} reference
+            # will be displayed after.
+            hash=$("${cmd[@]}" 2>/dev/null | grep -P "\trefs/(heads|tags)/$branch" | tail -n1 | cut -f1)
             ;;
         svn)
             cmd=(svn info -r"$commit" "$url")
@@ -692,14 +697,18 @@ function rp_createBin() {
     local archive="$md_id.tar.gz"
     local dest="$__tmpdir/archives/$__binary_path/$md_type"
     mkdir -p "$dest"
-    rm -f "$dest/$archive"
+    rm -f "$dest/$archive" "$dest/$archive.asc"
     if tar cvzf "$dest/$archive" -C "$rootdir/$md_type" "$md_id"; then
-        if signFile "$dest/$archive"; then
-            chown $user:$user "$dest/$archive" "$dest/$archive.asc"
+        if [[ -n "$__gpg_signing_key" ]]; then
+            if signFile "$dest/$archive"; then
+                chown $user:$user "$dest/$archive" "$dest/$archive.asc"
+                return 0
+            fi
+        else
             return 0
         fi
     fi
-    rm -f "$dest/$archive" "$dest/$archive.asc"
+    rm -f "$dest/$archive"
     return 1
 }
 
