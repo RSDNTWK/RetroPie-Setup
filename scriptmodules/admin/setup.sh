@@ -179,13 +179,13 @@ function package_setup() {
         local has_binary=0
         local has_net=0
 
-        local ip="$(getIPAddress)"
-        [[ -n "$ip" ]] && has_net=1
+        isConnected && has_net=1
 
         # for modules with nonet flag that don't need to download data, we force has_net to 1, so we get install options
         hasFlag "${__mod_info[$id/flags]}" "nonet" && has_net=1
 
         if [[ "$has_net" -eq 1 ]]; then
+            dialog --backtitle "$__backtitle" --infobox "Checking for updates for $id ..." 3 60 >/dev/tty
             rp_hasBinary "$id"
             local ret="$?"
             [[ "$ret" -eq 0 ]] && has_binary=1
@@ -253,7 +253,7 @@ function package_setup() {
                 options+=(S "${option_msgs[S]}")
            fi
         else
-            status+="\nInstall options disabled (Unable to access internet)"
+            status+="\nInstall options disabled:\n$__NET_ERRMSG"
         fi
 
         if [[ "$is_installed" -eq 1 ]]; then
@@ -269,7 +269,11 @@ function package_setup() {
 
         local help="${__mod_info[$id/desc]}\n\n${__mod_info[$id/help]}"
         if [[ -n "$help" ]]; then
-            options+=(H "Package Help")
+            options+=(H "Package help")
+        fi
+
+        if [[ "$is_installed" -eq 1 ]]; then
+            options+=(V "Package version information")
         fi
 
         cmd=(dialog --backtitle "$__backtitle" --cancel-label "Back" --default-item "$default" --menu "Choose an option for $id\n$status" 22 76 16)
@@ -328,6 +332,23 @@ function package_setup() {
             H)
                 printMsgs "dialog" "$help"
                 ;;
+            V)
+                local info
+                rp_loadPackageInfo "$id"
+                read -r -d '' info << _EOF_
+Package Origin: ${__mod_info[$id/pkg_origin]}
+Build Date: ${__mod_info[$id/pkg_date]}
+
+Built from source via:
+
+Type: ${__mod_info[$id/pkg_repo_type]}
+URL: ${__mod_info[$id/pkg_repo_url]}
+Branch: ${__mod_info[$id/pkg_repo_branch]}
+Commit: ${__mod_info[$id/pkg_repo_commit]}
+Date: ${__mod_info[$id/pkg_repo_date]}
+_EOF_
+               printMsgs "dialog" "$info"
+               ;;
             Z)
                 rp_callModule "$id" clean
                 printMsgs "dialog" "$__builddir/$id has been removed."
@@ -351,9 +372,8 @@ function section_gui_setup() {
         local pkgs=()
 
         status="Please choose a package from below"
-        local ip="$(getIPAddress)"
-        if [[ -z "$ip" ]]; then
-            status+="\nInstall options disabled (Unable to access internet)"
+        if ! isConnected; then
+            status+="\nInstall options disabled ($__NET_ERRMSG)"
             has_net=0
         fi
 
