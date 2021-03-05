@@ -19,6 +19,8 @@ declare -A __sections=(
     [depends]="dependency"
 )
 
+__NET_ERRMSG=""
+
 function rp_listFunctions() {
     local id
     local desc
@@ -133,8 +135,7 @@ function rp_callModule() {
             local has_binary=0
             local has_net=0
 
-            local ip="$(getIPAddress)"
-            [[ -n "$ip" ]] && has_net=1
+            isConnected && has_net=1
 
             # for modules with nonet flag that don't need to download data, we force has_net to 1
             hasFlag "${__mod_info[$id/flags]}" "nonet" && has_net=1
@@ -148,7 +149,7 @@ function rp_callModule() {
 
             # fail if we don't seem to be connected
             if [[ "$has_net" -eq 0 ]]; then
-                __ERRMSGS+=("Can't install/update $md_id - unable to connect to the internet")
+                __ERRMSGS+=("Can't install/update $md_id - $__NET_ERRMSG")
                 return 1
             fi
 
@@ -424,7 +425,9 @@ function rp_getBinaryUrl() {
 function rp_remoteFileExists() {
     local url="$1"
     local ret
-    curl --max-time 5 -o /dev/null -sfI "$url"
+    # runCurl will cause stderr to be copied to output so we redirect both stdout/stderr to /dev/null.
+    # any errors will have been captured by runCurl
+    runCurl --max-time 10 --silent --show-error --fail --head "$url" &>/dev/null
     ret="$?"
     if [[ "$ret" -eq 0 ]]; then
         return 0
@@ -468,7 +471,7 @@ function rp_getFileDate() {
     [[ -z "$url" ]] && return 1
 
     # get last-modified date stripping any CR in the output
-    local file_date=$(curl -sfI --no-styled-output "$url" | tr -d "\r" | grep -ioP "last-modified: \K.+")
+    local file_date=$(runCurl --silent --fail --head --no-styled-output "$url" | tr -d "\r" | grep -ioP "last-modified: \K.+")
     # if there is a date set in last-modified header, then convert to iso-8601 format
     if [[ -n "$file_date" ]]; then
         file_date="$(date -Iseconds --date="$file_date")"
@@ -540,7 +543,7 @@ function rp_getRemoteRepoHash() {
             ;;
         svn)
             cmd=(svn info -r"$commit" "$url")
-            hash=$("${cmd[@]}" 2>/dev/null | grep -oP "Revision: \K.*")
+            hash=$("${cmd[@]}" 2>/dev/null | grep -oP "Last Changed Rev: \K.*")
             ;;
     esac
     ret="$?"
@@ -594,7 +597,7 @@ function rp_hasNewerModule() {
                     local repo_branch="$(rp_resolveRepoParam "${__mod_info[$id/repo_branch]}")"
                     local repo_commit="$(rp_resolveRepoParam "${__mod_info[$id/repo_commit]}")"
                     # if we are locked to a single commit, then we compare against the current module commit only
-                    if [[ -n "$repo_commit" ]]; then
+                    if [[ -n "$repo_commit" && "$repo_commit" != "HEAD" ]]; then
                         # if we are using git and the module has an 8 character commit hash, then adjust
                         # the package commit to 8 characters also for the comparison
                         if [[ "$repo_type" == "git" && "${#repo_commit}" -eq 8 ]]; then
@@ -684,13 +687,13 @@ function rp_installBin() {
 function rp_createBin() {
     printHeading "Creating binary archive for $md_desc"
 
-    if [[ ! -d "$rootdir/$md_type/$md_id" ]]; then
-        printMsgs "console" "No install directory $rootdir/$md_type/$md_id - no archive created"
+    if [[ ! -d "$md_inst" ]]; then
+        printMsgs "console" "No install directory $md_inst - no archive created"
         return 1
     fi
 
-    if dirIsEmpty "$rootdir/$md_type/$md_id"; then
-        printMsgs "console" "Empty install directory $rootdir/$md_type/$md_id - no archive created"
+    if dirIsEmpty "$md_inst"; then
+        printMsgs "console" "Empty install directory $md_inst - no archive created"
         return 1
     fi
 
@@ -698,18 +701,23 @@ function rp_createBin() {
     local dest="$__tmpdir/archives/$__binary_path/$md_type"
     mkdir -p "$dest"
     rm -f "$dest/$archive" "$dest/$archive.asc"
+    local ret=1
     if tar cvzf "$dest/$archive" -C "$rootdir/$md_type" "$md_id"; then
         if [[ -n "$__gpg_signing_key" ]]; then
             if signFile "$dest/$archive"; then
                 chown $user:$user "$dest/$archive" "$dest/$archive.asc"
-                return 0
+                ret=0
             fi
         else
-            return 0
+            ret=0
         fi
     fi
-    rm -f "$dest/$archive"
-    return 1
+    if [[ "$ret" -eq 0 ]]; then
+        cp "$md_inst/retropie.pkg" "$dest/$md_id.pkg"
+    else
+        rm -f "$dest/$archive"
+    fi
+    return "$ret"
 }
 
 function rp_hasModule() {
@@ -780,7 +788,7 @@ function rp_setPackageInfo() {
                 else
                     pkg_repo_date="$(svn info . | grep -oP "Last Changed Date: \K.*")"
                     pkg_repo_date="$(date -Iseconds -d "$pkg_repo_date")"
-                    pkg_repo_commit="$(svn info . | grep -oP "Revision: \K.*")"
+                    pkg_repo_commit="$(svn info . | grep -oP "Last Changed Rev: \K.*")"
                 fi
                 ;;
             file)
@@ -834,6 +842,12 @@ function rp_loadPackageInfo() {
 
     local load=0
     local pkg_file="$(rp_getInstallPath $id)/retropie.pkg"
+
+    local builder_pkg_file="$__tmpdir/archives/$__binary_path/${__mod_info[$id/type]}/$id.pkg"
+    # fallback to using package info for built binaries so the binary builder code can update only changed modules
+    if [[ ! -f "$pkg_file" && -f "$builder_pkg_file" ]]; then
+        pkg_file="$builder_pkg_file"
+    fi
 
     # if the pkg file is available, we will load the data in the next loop
     [[ -f "$pkg_file" ]] && load=1
