@@ -91,3 +91,73 @@ EOF
     mv "$tmpfile" "$home/.asoundrc"
     chown "$user:$user" "$home/.asoundrc"
 }
+
+function _pulseaudio_audiosettings() {
+    local cmd=(dialog --backtitle "$__backtitle" --menu "Set audio output (PulseAudio)." 22 86 16)
+    local options=()
+    local sink_index
+    local sink_label
+
+    # Check if PulseAudio is running, otherwise 'pacmd' will not work
+    if ! _pa_cmd_audiosettings pacmd stat>/dev/null; then
+        printMsgs "dialog" "PulseAudio is enabled, but not running\nAudio settings cannot be set right now"
+        return
+    fi
+    while read sink_index sink_label; do
+        options+=("$sink_index" "$sink_label")
+    done < <(_pa_cmd_audiosettings pacmd list-sinks | \
+            awk -F [:=] '/index/ { idx=$2;
+                         do {getline} while($0 !~ "alsa.name");
+                         gsub(/"|bcm2835[^a-zA-Z]+/, "", $2);
+                         print idx,$2 }'
+            )
+
+    options+=(
+        M "Mixer - adjust output volume"
+        R "Reset to default"
+        P "Disable PulseAudio"
+    )
+    choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+    if [[ -n "$choice" ]]; then
+        case "$choice" in
+            [0-9])
+                _pa_cmd_audiosettings pactl set-default-sink $choice
+                rm -f "$home/.asoundrc"
+                printMsgs "dialog" "Set audio output to ${options[$((choice*2+1))]}"
+                ;;
+            M)
+                alsamixer >/dev/tty </dev/tty
+                alsactl store
+                ;;
+            R)
+                rm -fr "$home/.config/pulse"
+                /etc/init.d/alsa-utils reset
+                alsactl store
+                printMsgs "dialog" "Audio settings reset to defaults"
+                ;;
+            P)
+                _toggle_pulseaudio_audiosettings "off"
+                printMsgs "dialog" "PulseAudio disabled"
+                ;;
+        esac
+    fi
+}
+
+function _toggle_pulseaudio_audiosettings() {
+    local state=$1
+
+    if [[ "$state" == "on" ]]; then
+        _pa_cmd_audiosettings systemctl --user unmask pulseaudio.socket
+        _pa_cmd_audiosettings systemctl --user start  pulseaudio.service
+    fi
+
+    if [[ "$state" == "off" ]]; then
+        _pa_cmd_audiosettings systemctl --user mask pulseaudio.socket
+        _pa_cmd_audiosettings systemctl --user stop pulseaudio.service
+    fi
+}
+
+# Run PulseAudio commands as the calling user
+function _pa_cmd_audiosettings() {
+    [[ -n "$@" ]] && sudo -u "$user" XDG_RUNTIME_DIR=/run/user/$SUDO_UID "$@" 2>/dev/null
+}
