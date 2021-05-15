@@ -22,7 +22,7 @@ function sources_lr-genesis-plus-gx() {
 
 function build_lr-genesis-plus-gx() {
     make -f Makefile.libretro clean
-    make -f Makefile.libretro
+    make -f Makefile.libretro HAVE_VULKAN=1
     md_ret_require="$md_build/genesis_plus_gx_libretro.so"
 }
 

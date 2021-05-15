@@ -30,11 +30,11 @@ function build_lr-pcsx-rearmed() {
     local params=(THREAD_RENDERING=0)
 
     if isPlatform "arm"; then
-        params+=(ARCH=arm DYNAREC=ari64)
+        params+=(ARCH=arm DYNAREC=ari64 HAVE_VULKAN=1)
         if isPlatform "neon"; then
-            params+=(HAVE_NEON=1 BUILTIN_GPU=neon)
+            params+=(HAVE_NEON=1 BUILTIN_GPU=neon HAVE_VULKAN=1)
         else
-            params+=(HAVE_NEON=0 BUILTIN_GPU=peops)
+            params+=(HAVE_NEON=0 BUILTIN_GPU=peops HAVE_VULKAN=1)
         fi
     fi
 

@@ -22,7 +22,7 @@ function sources_lr-snes9x() {
 
 function build_lr-snes9x() {
     local params=()
-    isPlatform "arm" && params+=(platform="armv")
+    isPlatform "arm" && params+=(platform="armv" HAVE_VULKAN=1)
 
     cd libretro
     make "${params[@]}" clean

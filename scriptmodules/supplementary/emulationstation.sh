@@ -132,13 +132,13 @@ function depends_emulationstation() {
     local depends=(
         libfreeimage-dev libfreetype6-dev
         libcurl4-openssl-dev libasound2-dev cmake libsdl2-dev libsm-dev
-        libvlc-dev libvlccore-dev vlc
+        libvlc-dev libvlccore-dev vlc libvulkan-dev
     )
 
-    compareVersions "$__os_debian_ver" gt 8 && depends+=(rapidjson-dev)
-    isPlatform "x11" && depends+=(gnome-terminal)
+    compareVersions "$__os_debian_ver" gt 8 && depends+=(rapidjson-dev libvulkan-dev)
+    isPlatform "x11" && depends+=(gnome-terminal libvulkan-dev)
     if isPlatform "rpi" && isPlatform "32bit" && ! isPlatform "osmc"; then
-        depends+=(omxplayer)
+        depends+=(omxplayer libvulkan-dev)
     fi
     getDepends "${depends[@]}"
 }
@@ -161,14 +161,14 @@ function sources_emulationstation() {
 function build_emulationstation() {
     local params=(-DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/)
     if isPlatform "rpi"; then
-        params+=(-DRPI=On)
+        params+=(-DRPI=On -DHAVE_VULKAN=1)
         # use OpenGL on RPI/KMS for now
-        isPlatform "mesa" && params+=(-DGL=On)
+        isPlatform "mesa" && params+=(-DGL=On -DHAVE_VULKAN=1)
         # force GLESv1 on videocore due to performance issue with GLESv2
-        isPlatform "videocore" && params+=(-DUSE_GLES1=On)
+        isPlatform "videocore" && params+=(-DUSE_GLES1=On -DHAVE_VULKAN=1)
     elif isPlatform "x11"; then
         local gl_ver=$(sudo -u $user glxinfo | grep -oP "OpenGL version string: \K(\d+)")
-        [[ "$gl_ver" -gt 1 ]] && params+=(-DUSE_OPENGL_21=On)
+        [[ "$gl_ver" -gt 1 ]] && params+=(-DUSE_OPENGL_21=On -DHAVE_VULKAN=1)
     fi
     rpSwap on 1000
     cmake . "${params[@]}"

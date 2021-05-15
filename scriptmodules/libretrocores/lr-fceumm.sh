@@ -22,7 +22,7 @@ function sources_lr-fceumm() {
 
 function build_lr-fceumm() {
     make -f Makefile.libretro clean
-    make -f Makefile.libretro
+    make -f Makefile.libretro HAVE_VULKAN=1
     md_ret_require="$md_build/fceumm_libretro.so"
 }
 

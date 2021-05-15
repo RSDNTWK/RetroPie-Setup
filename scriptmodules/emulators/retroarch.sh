@@ -17,9 +17,9 @@ rp_module_section="core"
 
 function depends_retroarch() {
     local depends=(libudev-dev libxkbcommon-dev libsdl2-dev libasound2-dev libusb-1.0-0-dev)
-    isPlatform "rpi" && depends+=(libraspberrypi-dev)
+    isPlatform "rpi" && depends+=(libraspberrypi-dev libvulkan-dev)
     isPlatform "gles" && ! isPlatform "vero4k" && depends+=(libgles2-mesa-dev)
-    isPlatform "mesa" && depends+=(libx11-xcb-dev)
+    isPlatform "mesa" && depends+=(libx11-xcb-dev libvulkan-dev)
     isPlatform "mali" && depends+=(mali-fbdev)
     isPlatform "x11" && depends+=(libx11-xcb-dev libpulse-dev libvulkan-dev)
     isPlatform "vero4k" && depends+=(vero3-userland-dev-osmc zlib1g-dev libfreetype6-dev)
@@ -58,15 +58,15 @@ function build_retroarch() {
     fi
     isPlatform "gles" && params+=(--enable-opengles)
     isPlatform "gles3" && params+=(--enable-opengles3)
-    isPlatform "rpi" && isPlatform "mesa" && params+=(--disable-videocore)
+    isPlatform "rpi" && isPlatform "mesa" && params+=(--disable-videocore --enable-vulkan --disable-wayland)
     # Temporarily block dispmanx support for fkms until upstream support is fixed
     isPlatform "dispmanx" && ! isPlatform "kms" && params+=(--enable-dispmanx --disable-opengl1)
     isPlatform "mali" && params+=(--enable-mali_fbdev)
-    isPlatform "kms" && params+=(--enable-kms --enable-egl)
+    isPlatform "kms" && params+=(--enable-kms --enable-egl --enable-vulkan --disable-wayland)
     isPlatform "arm" && params+=(--enable-floathard)
     isPlatform "neon" && params+=(--enable-neon)
     isPlatform "x11" && params+=(--enable-vulkan)
-    ! isPlatform "x11" && params+=(--disable-vulkan --disable-wayland)
+    ! isPlatform "x11" && params+=()
     isPlatform "vero4k" && params+=(--enable-mali_fbdev --with-opengles_libs='-L/opt/vero3/lib')
     ./configure --prefix="$md_inst" "${params[@]}"
     make clean
@@ -88,6 +88,7 @@ function update_shaders_retroarch() {
     # remove if not git repository for fresh checkout
     [[ ! -d "$dir/.git" ]] && rm -rf "$dir"
     gitPullOrClone "$dir" https://github.com/RetroPie/common-shaders.git "$branch"
+	[[ ! -d "$dir/.git" ]] && rm -rf "$dir/.git"
     chown -R $user:$user "$dir"
 }
 
