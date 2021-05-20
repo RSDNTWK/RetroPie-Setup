@@ -12,7 +12,7 @@
 rp_module_id="retroarch"
 rp_module_desc="RetroArch - frontend to the libretro emulator cores - required by all lr-* emulators"
 rp_module_licence="GPL3 https://raw.githubusercontent.com/libretro/RetroArch/master/COPYING"
-rp_module_repo="git https://github.com/libretro/RetroArch.git v1.8.8"
+rp_module_repo="git https://github.com/libretro/RetroArch.git v1.9.3"
 rp_module_section="core"
 
 function depends_retroarch() {
@@ -40,11 +40,10 @@ function depends_retroarch() {
 }
 
 function sources_retroarch() {
-    gitPullOrClone "$md_build" https://github.com/libretro/RetroArch.git v1.9.0
+    gitPullOrClone
     applyPatch "$md_data/01_disable_search.diff"
     applyPatch "$md_data/02_shader_path_config_enable.diff"
     applyPatch "$md_data/03_revert_default_save_paths.diff"
-    applyPatch "$md_data/04_fix_static_function_placement.diff"
 }
 
 function build_retroarch() {
@@ -57,8 +56,12 @@ function build_retroarch() {
         params+=(--disable-ffmpeg)
     fi
     isPlatform "gles" && params+=(--enable-opengles)
-    isPlatform "gles3" && params+=(--enable-opengles3)
-    isPlatform "rpi" && isPlatform "mesa" && params+=(--disable-videocore --enable-vulkan --disable-wayland)
+    if isPlatform "gles3"; then
+        params+=(--enable-opengles3 --enable-vulkan)
+        isPlatform "gles31" && params+=(--enable-opengles3_1)
+        isPlatform "gles32" && params+=(--enable-opengles3_2)
+    fi
+    isPlatform "rpi" && isPlatform "mesa" && params+=(--disable-videocore)
     # Temporarily block dispmanx support for fkms until upstream support is fixed
     isPlatform "dispmanx" && ! isPlatform "kms" && params+=(--enable-dispmanx --disable-opengl1)
     isPlatform "mali" && params+=(--enable-mali_fbdev)
@@ -162,6 +165,7 @@ function configure_retroarch() {
     iniSet "video_aspect_ratio_auto" "true"
     iniSet "rgui_show_start_screen" "false"
     iniSet "rgui_browser_directory" "$romdir"
+    iniSet "rgui_switch_icons" "false"
 
     if ! isPlatform "x86"; then
         iniSet "video_threaded" "true"
