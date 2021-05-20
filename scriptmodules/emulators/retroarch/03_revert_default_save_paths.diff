@@ -13,4 +13,5 @@ index d48cc12fe3..f32c25c2bc 100644
 -   fill_pathname_join(g_defaults.dirs[DEFAULT_DIR_SYSTEM], base_path,
 -         "system", sizeof(g_defaults.dirs[DEFAULT_DIR_SYSTEM]));
  #endif
+ 
  #ifndef IS_SALAMANDER
