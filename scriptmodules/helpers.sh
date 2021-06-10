@@ -1033,7 +1033,7 @@ function applyPatch() {
 function runCurl() {
     local params=("$@")
     # add any user supplied curl opts - timeouts can be overridden as curl uses the last parameters given
-    [[ -z "$__curl_opts" ]] && params+=($__curl_opts)
+    [[ -n "$__curl_opts" ]] && params+=($__curl_opts)
 
     local cmd_err
     local ret
@@ -1086,7 +1086,7 @@ function download() {
 
     local params=(--location)
     if [[ "$dest" == "-" ]]; then
-        params+=(-s)
+        params+=(--silent --no-buffer)
     else
         printMsgs "console" "Downloading $url to $dest ..."
         params+=(-o "$dest")
