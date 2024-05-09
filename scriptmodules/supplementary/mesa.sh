@@ -31,7 +31,7 @@ function _latest_ver_mesa() {
 
 function depends_mesa() {
     #local depends=(meson ninja-build libgbm-dev libdrm-dev libpciaccess-dev)
-    local depends=(vulkan-tools libxcb-shm0-dev)
+    local depends=(vulkan-tools libxcb-shm0-dev meson ninja-build libgbm-dev libdrm-dev libpciaccess-dev)
 
     getDepends "${depends[@]}"
     
