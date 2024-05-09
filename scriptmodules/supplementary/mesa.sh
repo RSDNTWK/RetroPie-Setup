@@ -13,7 +13,7 @@ rp_module_id="mesa"
 rp_module_desc="Mesa3d OpenGL and Vulkan Drivers"
 rp_module_licence="MIT https://www.mesa3d.org/license.html"
 rp_module_section="depends"
-rp_module_flags="rpi4 x11"
+rp_module_flags="rpi4 rpi5 x11"
 
 # Based on instructions from: https://www.reddit.com/r/RetroPie/comments/egjqw2/how_to_manually_compile_newest_mesa_drivers_for/
 # Research for Vulkan:
@@ -63,7 +63,7 @@ function build_mesa() {
     #cd /home/pi/mesa/build
 
     # 7: Now compile the new version of MESA:
-    meson builddir --prefix="$md_inst" --libdir lib -Dplatforms=x11     -Dvulkan-drivers=broadcom -Dgallium-drivers=v3d,kmsro,vc4,virgl --buildtype debug
+    meson builddir --prefix="$md_inst" --libdir lib -Dplatforms=x11 -Dvulkan-drivers=broadcom -Dgallium-drivers=v3d,kmsro,vc4,virgl --buildtype debug
     ninja -C builddir
 }
 

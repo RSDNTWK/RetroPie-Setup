@@ -14,7 +14,7 @@ rp_module_desc="WINEHQ - Wine Is Not an Emulator"
 rp_module_help="Use your app's Installer or place your x86 Windows binaries into $romdir/wine"
 rp_module_licence="LGPL https://wiki.winehq.org/Licensing"
 rp_module_section="exp"
-rp_module_flags="rpi4"
+rp_module_flags="rpi4 rpi5"
 # TODO: Currently only tested on RPI4 platform. Other RPI platforms should also work.
 #       X86 platform requires some modification in the Ports scripts so that the custom Mesa path is removed.
 

@@ -14,7 +14,7 @@ rp_module_desc="Box86 emulator"
 rp_module_help="Place your x86 binaries $romdir/box86"
 rp_module_licence="MIT https://github.com/ptitSeb/box86/blob/master/LICENSE"
 rp_module_section="exp"
-rp_module_flags="rpi4 x11"
+rp_module_flags="rpi4 rpi5 x11"
 
 function _latest_ver_box86() {
     # This defines the Git tag / branch which will be used. Main repository is at:
