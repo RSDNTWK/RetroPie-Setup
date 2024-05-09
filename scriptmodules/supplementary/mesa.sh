@@ -63,7 +63,7 @@ function build_mesa() {
     #cd /home/pi/mesa/build
 
     # 7: Now compile the new version of MESA:
-    meson builddir --prefix="$md_inst" --libdir lib -Dplatforms=x11     -Dvulkan-drivers=broadcom -Ddri-drivers= -Dgallium-drivers=v3d,kmsro,vc4,virgl --buildtype debug
+    meson builddir --prefix="$md_inst" --libdir lib -Dplatforms=x11     -Dvulkan-drivers=broadcom -Dgallium-drivers=v3d,kmsro,vc4,virgl --buildtype debug
     ninja -C builddir
 }
 
