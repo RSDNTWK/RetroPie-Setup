@@ -17,7 +17,7 @@ rp_module_flags=""
 
 function get_ver_sdl2() {
     if [[ "$__os_debian_ver" -ge 11 ]]; then
-        echo "2.28.5"
+        echo "2.30.4"
     else
         echo "2.0.10"
     fi
@@ -70,7 +70,7 @@ function sources_sdl2() {
     local pkg_ver="$(get_pkg_ver_sdl2)"
     local branch="retropie-${ver}"
 
-    gitPullOrClone "$md_build/$pkg_ver" https://github.com/RetroPie/SDL.git "$branch"
+    gitPullOrClone "$md_build/$pkg_ver" https://github.com/cmitu/SDL.git "$branch"
     cd "$pkg_ver"
     DEBEMAIL="Jools Wills <buzz@exotica.org.uk>" dch -v "$pkg_ver" "SDL $ver configured for the $__platform"
 }
