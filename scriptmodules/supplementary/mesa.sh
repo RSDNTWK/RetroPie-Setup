@@ -75,5 +75,9 @@ function install_mesa() {
     cd ..
 
     # The following line is to configure the location of Vulkan
-    echo export VK_ICD_FILENAMES="$md_inst"/share/vulkan/icd.d/broadcom_icd.armv7l.json >> /home/pi/.profile
+	   if isPlatform "32bit"; then
+		echo export VK_ICD_FILENAMES="$md_inst"/share/vulkan/icd.d/broadcom_icd.armv7l.json >> /home/pi/.profile
+    else
+		echo export VK_ICD_FILENAMES="$md_inst"/share/vulkan/icd.d/broadcom_icd.aarch64.json >> /home/pi/.profile
+    fi		
 }
