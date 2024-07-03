@@ -59,7 +59,7 @@ function depends_sdl2() {
     local depends=(devscripts debhelper dh-autoreconf)
 
     isPlatform "mali" && depends+=(mali-fbdev)
-    isPlatform "rpi" && depends+=()
+    isPlatform "rpi" && depends+=(libraspberrypi-dev)
     isPlatform "vero4k" && depends+=(vero3-userland-dev-osmc)
 
     getDepends $(_list_depends_sdl2) "${depends[@]}"
