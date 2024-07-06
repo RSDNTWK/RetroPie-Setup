@@ -37,7 +37,7 @@ function sources_xpad() {
 }
 
 function build_xpad() {
-    dkmsManager install xpad "$(_version_xpad)"
+    dkmsManager install xpad "$(_version_xpad) --kernelsourcedir=/usr/include"
 }
 
 function remove_xpad() {
