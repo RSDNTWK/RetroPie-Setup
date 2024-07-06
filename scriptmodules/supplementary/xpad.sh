@@ -22,7 +22,7 @@ function _version_xpad() {
 }
 
 function depends_xpad() {
-    local depends=(dkms)
+    local depends=(dkms LINUX-HEADERS)
     getDepends "${depends[@]}"
 }
 
