@@ -27,10 +27,8 @@ function sources_gpsp() {
 
 function build_gpsp() {
     cd raspberrypi
-    rpSwap on 512
     make clean
     make CC="gcc-6"
-    rpSwap off
     md_ret_require="$md_build/raspberrypi/gpsp"
 }
 

@@ -154,7 +154,6 @@ function sources_mupen64plus() {
 }
 
 function build_mupen64plus() {
-    rpSwap on 750
 
     local dir
     local params=()
@@ -198,7 +197,6 @@ function build_mupen64plus() {
     make
     popd
 
-    rpSwap off
     md_ret_require=(
         'mupen64plus-ui-console/projects/unix/mupen64plus'
         'mupen64plus-core/projects/unix/libmupen64plus.so.2.0.0'

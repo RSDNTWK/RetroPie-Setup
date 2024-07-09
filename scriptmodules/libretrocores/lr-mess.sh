@@ -26,15 +26,9 @@ function sources_lr-mess() {
 }
 
 function build_lr-mess() {
-    if isPlatform "64bit"; then
-        rpSwap on 10240
-    else
-        rpSwap on 6144
-    fi
     local params=($(_get_params_lr-mame) SUBTARGET=mess)
     make clean
     make "${params[@]}"
-    rpSwap off
     md_ret_require="$md_build/mamemess_libretro.so"
 }
 

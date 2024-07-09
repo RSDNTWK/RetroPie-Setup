@@ -29,10 +29,8 @@ function build_hypseus() {
     rm -rf build
     mkdir build
     cd build
-    rpSwap on 1024
     cmake ../src
     make
-    rpSwap off
     cp hypseus ../hypseus.bin
     md_ret_require="hypseus"
 }

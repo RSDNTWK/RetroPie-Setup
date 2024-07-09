@@ -21,7 +21,6 @@ function sources_lr-mrboom() {
 }
 
 function build_lr-mrboom() {
-    rpSwap on 1000
     make clean
     if isPlatform "neon"; then
         make HAVE_NEON=1
