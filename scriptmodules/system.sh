@@ -456,6 +456,9 @@ function get_platform() {
                         *raspberrypi*)
                             get_rpi_model
                             ;;
+                        *odroid-xu[3|4]*)
+                            __platform="odroid-xu"
+                            ;;
                         *tegra186*)
                             __platform="tegra-x2"
                             ;;
