@@ -43,12 +43,6 @@ function sources_mame() {
 }
 
 function build_mame() {
-    # More memory is required for 64bit platforms
-    if isPlatform "64bit"; then
-        rpSwap on 10240
-    else
-        rpSwap on 8192
-    fi
 
     local params=(NOWERROR=1 ARCHOPTS="-U_FORTIFY_SOURCE -Wl,-s" PYTHON_EXECUTABLE=python3 OPTIMIZE=2 USE_SYSTEM_LIB_FLAC=1)
     isPlatform "x11" && params+=(USE_QTDEBUG=1) || params+=(USE_QTDEBUG=0)
@@ -65,7 +59,6 @@ function build_mame() {
         QT_SELECT=5 make "${params[@]}"
     fi
 
-    rpSwap off
     md_ret_require="$md_build/mame"
 }
 

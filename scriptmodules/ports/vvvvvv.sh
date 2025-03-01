@@ -28,10 +28,8 @@ function sources_vvvvvv() {
 
 function build_vvvvvv() {
     cmake desktop_version
-    rpSwap on 1500
     make clean
     make
-    rpSwap off
     md_ret_require="$md_build/VVVVVV"
 }
 

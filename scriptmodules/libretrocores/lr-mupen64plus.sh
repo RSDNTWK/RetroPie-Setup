@@ -52,7 +52,6 @@ function sources_lr-mupen64plus() {
 }
 
 function build_lr-mupen64plus() {
-    rpSwap on 750
     local params=()
     if isPlatform "videocore"; then
         params+=(platform="$__platform")
@@ -71,7 +70,6 @@ function build_lr-mupen64plus() {
     fi
     make clean
     make "${params[@]}"
-    rpSwap off
     md_ret_require="$md_build/mupen64plus_libretro.so"
 }
 

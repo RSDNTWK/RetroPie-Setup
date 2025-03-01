@@ -42,15 +42,9 @@ function sources_lr-mame() {
 }
 
 function build_lr-mame() {
-    if isPlatform "64bit"; then
-        rpSwap on 10240
-    else
-        rpSwap on 6144
-    fi
     local params=($(_get_params_lr-mame) SUBTARGET=arcade)
     make clean
     make "${params[@]}"
-    rpSwap off
     md_ret_require="$md_build/mamearcade_libretro.so"
 }
 

@@ -22,12 +22,10 @@ function sources_lr-gpsp() {
 }
 
 function build_lr-gpsp() {
-    rpSwap on 512
     local params=()
     isPlatform "arm" && params+=(platform=armv)
     make "${params[@]}" clean
     make "${params[@]}"
-    rpSwap off
     md_ret_require="$md_build/gpsp_libretro.so"
 }
 

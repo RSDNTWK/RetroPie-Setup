@@ -188,11 +188,9 @@ function build_emulationstation() {
         params+=(-DOMX=On)
     fi
 
-    rpSwap on 1000
     cmake . "${params[@]}"
     make clean
     make VERBOSE=1
-    rpSwap off
     md_ret_require="$md_build/emulationstation"
 }
 

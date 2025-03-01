@@ -29,7 +29,6 @@ function sources_lr-parallel-n64() {
 }
 
 function build_lr-parallel-n64() {
-    rpSwap on 1000
     local params=()
     if isPlatform "videocore" || isPlatform "odroid-c1"; then
         params+=(platform="$__platform")
@@ -45,7 +44,6 @@ function build_lr-parallel-n64() {
     fi
     make clean
     make "${params[@]}"
-    rpSwap off
     md_ret_require="$md_build/parallel_n64_libretro.so"
 }
 
