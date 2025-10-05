@@ -18,7 +18,7 @@ rp_module_flags="sdl2 !armv6"
 
 function _get_version_gzdoom() {
     # default GZDoom version
-    local gzdoom_version="g4.13.1"
+    local gzdoom_version="g4.14.2"
 
     # 32 bit is no longer supported since g4.8.1
     isPlatform "32bit" && gzdoom_version="g4.8.0"
@@ -43,6 +43,8 @@ function sources_gzdoom() {
     sed -i 's/IMPORTED_TARGET libw/IMPORTED_TARGET GLOBAL libw/' CMakeLists.txt
     # lzma assumes hardware crc support on arm which breaks when building on armv7
     isPlatform "armv7" && applyPatch "$md_data/lzma_armv7_crc.diff"
+    # fix build with gcc 12 for armv8 on aarch64 kernel due to -ffast-math options
+    isPlatform "armv8" && [[ "$__gcc_version" -eq 12 ]] && applyPatch "$md_data/armv8_gcc12_fix.diff"
 }
 
 function build_gzdoom() {
@@ -74,7 +76,7 @@ function install_gzdoom() {
         'release/game_widescreen_gfx.pk3'
         'release/soundfonts'
         "release/zmusic/lib/libzmusic.so.1"
-        "release/zmusic/lib/libzmusic.so.1.1.14"
+        "release/zmusic/lib/libzmusic.so.1.2.0"
         'README.md'
     )
 }
